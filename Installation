@@ -1,0 +1,401 @@
+C:\Windows\system32>minikube start --kubernetes-version=v1.15.9  --memory=12000 --cpus=6 --driver=vmware
+* minikube v1.24.0 on Microsoft Windows 11 Pro For Workstations 10.0.22000 Build 22000
+* Using the vmware driver based on user configuration
+* Starting control plane node minikube in cluster minikube
+* Creating vmware VM (CPUs=6, Memory=12000MB, Disk=20000MB) ...
+    > kubelet.sha1: 41 B / 41 B [----------------------------] 100.00% ? p/s 0s
+    > kubectl.sha1: 41 B / 41 B [----------------------------] 100.00% ? p/s 0s
+    > kubeadm.sha1: 41 B / 41 B [----------------------------] 100.00% ? p/s 0s
+    > kubeadm: 38.33 MiB / 38.33 MiB [---------------] 100.00% 1.24 MiB p/s 31s
+    > kubectl: 41.00 MiB / 41.00 MiB [---------------] 100.00% 1.30 MiB p/s 32s
+    > kubelet: 114.16 MiB / 114.16 MiB [-------------] 100.00% 2.18 MiB p/s 53s
+
+  - Generating certificates and keys ...
+  - Booting up control plane ...
+  - Configuring RBAC rules ...
+* Verifying Kubernetes components...
+  - Using image gcr.io/k8s-minikube/storage-provisioner:v5
+* Enabled addons: storage-provisioner, default-storageclass
+
+! C:\Program Files\Kubectl\kubectl.exe is version 1.23.0, which may have incompatibilites with Kubernetes 1.15.9.
+  - Want kubectl v1.15.9? Try 'minikube kubectl -- get pods -A'
+* Done! kubectl is now configured to use "minikube" cluster and "default" namespace by default
+
+C:\Windows\system32>kubectl get nodes -o wide
+NAME       STATUS   ROLES    AGE   VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE              KERNEL-VERSION   CONTAINER-RUNTIME
+minikube   Ready    master   35s   v1.15.9   2.2.2.128     <none>        Buildroot 2021.02.4   4.19.202         docker://20.10.8
+
+C:\Windows\system32>kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin -- serviceaccount=kube-system:tiller
+clusterrolebinding.rbac.authorization.k8s.io/tiller-cluster-rule created
+
+C:\Windows\system32>helm init --service-account tiller
+$HELM_HOME has been configured at C:\Users\Pratik\.helm.
+
+Tiller (the Helm server-side component) has been installed into your Kubernetes Cluster.
+
+Please note: by default, Tiller is deployed with an insecure 'allow unauthenticated users' policy.
+To prevent this, run `helm init` with the --tiller-tls-verify flag.
+For more information on securing your installation see: https://v2.helm.sh/docs/securing_installation/
+
+C:\Windows\system32>helm repo add alfresco-stable https://kubernetes-charts.alfresco.com/stable
+"alfresco-stable" has been added to your repositories
+
+C:\Windows\system32>helm repo update
+Hang tight while we grab the latest from your chart repositories...
+...Skip local chart repository
+...Successfully got an update from the "alfresco-stable" chart repository
+...Successfully got an update from the "alfresco-incubator" chart repository
+...Successfully got an update from the "stable" chart repository
+Update Complete.
+
+C:\Windows\system32>helm repo list
+NAME                    URL
+stable                  https://charts.helm.sh/stable
+local                   http://127.0.0.1:8879/charts
+alfresco-stable         https://kubernetes-charts.alfresco.com/stable
+alfresco-incubator      http://kubernetes-charts.alfresco.com/incubator
+
+C:\Windows\system32>helm install stable/nginx-ingress --set rbac.create=true
+Error: could not find tiller
+
+C:\Windows\system32>minikube addons list
+|-----------------------------|----------|--------------|-----------------------|
+|         ADDON NAME          | PROFILE  |    STATUS    |      MAINTAINER       |
+|-----------------------------|----------|--------------|-----------------------|
+| ambassador                  | minikube | disabled     | unknown (third-party) |
+| auto-pause                  | minikube | disabled     | google                |
+| csi-hostpath-driver         | minikube | disabled     | kubernetes            |
+| dashboard                   | minikube | disabled     | kubernetes            |
+| default-storageclass        | minikube | enabled ✅   | kubernetes            |
+| efk                         | minikube | disabled     | unknown (third-party) |
+| freshpod                    | minikube | disabled     | google                |
+| gcp-auth                    | minikube | disabled     | google                |
+| gvisor                      | minikube | disabled     | google                |
+| helm-tiller                 | minikube | disabled     | unknown (third-party) |
+| ingress                     | minikube | disabled     | unknown (third-party) |
+| ingress-dns                 | minikube | disabled     | unknown (third-party) |
+| istio                       | minikube | disabled     | unknown (third-party) |
+| istio-provisioner           | minikube | disabled     | unknown (third-party) |
+| kubevirt                    | minikube | disabled     | unknown (third-party) |
+| logviewer                   | minikube | disabled     | google                |
+| metallb                     | minikube | disabled     | unknown (third-party) |
+| metrics-server              | minikube | disabled     | kubernetes            |
+| nvidia-driver-installer     | minikube | disabled     | google                |
+| nvidia-gpu-device-plugin    | minikube | disabled     | unknown (third-party) |
+| olm                         | minikube | disabled     | unknown (third-party) |
+| pod-security-policy         | minikube | disabled     | unknown (third-party) |
+| portainer                   | minikube | disabled     | portainer.io          |
+| registry                    | minikube | disabled     | google                |
+| registry-aliases            | minikube | disabled     | unknown (third-party) |
+| registry-creds              | minikube | disabled     | unknown (third-party) |
+| storage-provisioner         | minikube | enabled ✅   | kubernetes            |
+| storage-provisioner-gluster | minikube | disabled     | unknown (third-party) |
+| volumesnapshots             | minikube | disabled     | kubernetes            |
+|-----------------------------|----------|--------------|-----------------------|
+
+C:\Windows\system32>minikube addons enable helm-tiller
+  - Using image ghcr.io/helm/tiller:v2.17.0
+* The 'helm-tiller' addon is enabled
+
+C:\Windows\system32>helm install stable/nginx-ingress --set rbac.create=true
+Error: could not find a ready tiller pod
+
+C:\Windows\system32>helm install stable/nginx-ingress --set rbac.create=true
+Error: could not find a ready tiller pod
+
+C:\Windows\system32>kubect get sa -A
+'kubect' is not recognized as an internal or external command,
+operable program or batch file.
+
+C:\Windows\system32>kubectl get sa -A
+NAMESPACE         NAME                                 SECRETS   AGE
+default           default                              1         2m34s
+kube-node-lease   default                              1         2m34s
+kube-public       default                              1         2m34s
+kube-system       attachdetach-controller              1         2m48s
+kube-system       bootstrap-signer                     1         2m47s
+kube-system       certificate-controller               1         2m49s
+kube-system       clusterrole-aggregation-controller   1         2m34s
+kube-system       coredns                              1         2m48s
+kube-system       cronjob-controller                   1         2m47s
+kube-system       daemon-set-controller                1         2m34s
+kube-system       default                              1         2m34s
+kube-system       deployment-controller                1         2m44s
+kube-system       disruption-controller                1         2m46s
+kube-system       endpoint-controller                  1         2m45s
+kube-system       expand-controller                    1         2m47s
+kube-system       generic-garbage-collector            1         2m48s
+kube-system       horizontal-pod-autoscaler            1         2m49s
+kube-system       job-controller                       1         2m46s
+kube-system       kube-proxy                           1         2m48s
+kube-system       namespace-controller                 1         2m49s
+kube-system       node-controller                      1         2m47s
+kube-system       persistent-volume-binder             1         2m49s
+kube-system       pod-garbage-collector                1         2m50s
+kube-system       pv-protection-controller             1         2m49s
+kube-system       pvc-protection-controller            1         2m47s
+kube-system       replicaset-controller                1         2m34s
+kube-system       replication-controller               1         2m49s
+kube-system       resourcequota-controller             1         2m46s
+kube-system       service-account-controller           1         2m50s
+kube-system       service-controller                   1         2m48s
+kube-system       statefulset-controller               1         2m45s
+kube-system       storage-provisioner                  1         2m45s
+kube-system       tiller                               1         35s
+kube-system       token-cleaner                        1         2m45s
+kube-system       ttl-controller                       1         2m45s
+
+C:\Windows\system32>helm install stable/nginx-ingress --set rbac.create=true
+NAME:   winning-quail
+LAST DEPLOYED: Wed Dec 15 00:01:12 2021
+NAMESPACE: default
+STATUS: DEPLOYED
+
+RESOURCES:
+==> v1/ClusterRole
+NAME                         AGE
+winning-quail-nginx-ingress  1s
+
+==> v1/ClusterRoleBinding
+NAME                         AGE
+winning-quail-nginx-ingress  1s
+
+==> v1/Deployment
+NAME                                         READY  UP-TO-DATE  AVAILABLE  AGE
+winning-quail-nginx-ingress-controller       0/1    1           0          1s
+winning-quail-nginx-ingress-default-backend  0/1    1           0          1s
+
+==> v1/Pod(related)
+NAME                                                          READY  STATUS             RESTARTS  AGE
+winning-quail-nginx-ingress-controller-cbcbc7446-2sprr        0/1    ContainerCreating  0         1s
+winning-quail-nginx-ingress-default-backend-869bff9fc5-g672g  0/1    ContainerCreating  0         1s
+winning-quail-nginx-ingress-controller-cbcbc7446-2sprr        0/1    ContainerCreating  0         1s
+winning-quail-nginx-ingress-default-backend-869bff9fc5-g672g  0/1    ContainerCreating  0         1s
+
+==> v1/Role
+NAME                         AGE
+winning-quail-nginx-ingress  1s
+
+==> v1/RoleBinding
+NAME                         AGE
+winning-quail-nginx-ingress  1s
+
+==> v1/Service
+NAME                                         TYPE          CLUSTER-IP     EXTERNAL-IP  PORT(S)                     AGE
+winning-quail-nginx-ingress-controller       LoadBalancer  10.109.12.114  <pending>    80:30435/TCP,443:30503/TCP  1s
+winning-quail-nginx-ingress-default-backend  ClusterIP     10.104.162.9   <none>       80/TCP                      1s
+
+==> v1/ServiceAccount
+NAME                                 SECRETS  AGE
+winning-quail-nginx-ingress          1        1s
+winning-quail-nginx-ingress-backend  1        1s
+
+
+NOTES:
+*******************************************************************************************************
+* DEPRECATED, please use https://github.com/kubernetes/ingress-nginx/tree/master/charts/ingress-nginx *
+*******************************************************************************************************
+
+
+The nginx-ingress controller has been installed.
+It may take a few minutes for the LoadBalancer IP to be available.
+You can watch the status by running 'kubectl --namespace default get services -o wide -w winning-quail-nginx-ingress-controller'
+
+An example Ingress that makes use of the controller:
+
+  apiVersion: extensions/v1beta1
+  kind: Ingress
+  metadata:
+    annotations:
+      kubernetes.io/ingress.class: nginx
+    name: example
+    namespace: foo
+  spec:
+    rules:
+      - host: www.example.com
+        http:
+          paths:
+            - backend:
+                serviceName: exampleService
+                servicePort: 80
+              path: /
+    # This section is only required if TLS is to be enabled for the Ingress
+    tls:
+        - hosts:
+            - www.example.com
+          secretName: example-tls
+
+If TLS is enabled for the Ingress, a Secret containing the certificate and key must also be provided:
+
+  apiVersion: v1
+  kind: Secret
+  metadata:
+    name: example-tls
+    namespace: foo
+  data:
+    tls.crt: <base64 encoded cert>
+    tls.key: <base64 encoded key>
+  type: kubernetes.io/tls
+
+
+C:\Windows\system32>kubectl get svc
+NAME                                          TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)                      AGE
+kubernetes                                    ClusterIP      10.96.0.1       <none>        443/TCP                      3m15s
+winning-quail-nginx-ingress-controller        LoadBalancer   10.109.12.114   <pending>     80:30435/TCP,443:30503/TCP   14s
+winning-quail-nginx-ingress-default-backend   ClusterIP      10.104.162.9    <none>        80/TCP                       14s
+
+C:\Windows\system32>kubectl get service  winning-quail-nginx-ingress-controller
+NAME                                     TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)                      AGE
+winning-quail-nginx-ingress-controller   LoadBalancer   10.109.12.114   <pending>     80:30435/TCP,443:30503/TCP   59s
+
+C:\Windows\system32>kubectl get service  winning-quail-nginx-ingress-controller --watch
+NAME                                     TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)                      AGE
+winning-quail-nginx-ingress-controller   LoadBalancer   10.109.12.114   <pending>     80:30435/TCP,443:30503/TCP   73s
+
+C:\Windows\system32>helm install alfresco-stable/alfresco-content-services-community --set externalProtocol="http" --set externalHost="acs-community.local" --set externalPort="30435"
+NAME:   crusty-opossum
+LAST DEPLOYED: Wed Dec 15 00:02:57 2021
+NAMESPACE: default
+STATUS: DEPLOYED
+
+RESOURCES:
+==> v1/ConfigMap
+NAME                                                    DATA  AGE
+crusty-opossum-alfresco-cs-ce-imagemagick-configmap     5     2s
+crusty-opossum-alfresco-cs-ce-libreoffice-configmap     5     2s
+crusty-opossum-alfresco-cs-ce-pdfrenderer-configmap     5     2s
+crusty-opossum-alfresco-cs-ce-repository-configmap      4     2s
+crusty-opossum-alfresco-cs-ce-share-configmap           5     2s
+crusty-opossum-alfresco-cs-ce-tika-configmap            5     2s
+crusty-opossum-alfresco-cs-ce-transform-misc-configmap  5     2s
+crusty-opossum-alfresco-search-solr-configmap           7     2s
+crusty-opossum-keycl                                    2     2s
+crusty-opossum-keycl-test                               1     2s
+crusty-opossum-nginx-ingress-controller                 3     2s
+crusty-opossum-postgresql-id                            0     2s
+
+==> v1/NetworkPolicy
+NAME              POD-SELECTOR                                  AGE
+activemq          app=crusty-opossum-activemq                   1s
+allow-dns-access  <none>                                        1s
+database          app=crusty-opossum-postgresql-acs             1s
+default-deny-all  <none>                                        1s
+deny-dashboard    k8s-app=kubernetes-dashboard                  1s
+nginx-ingress     app=nginx-ingress                             1s
+repository        app=crusty-opossum-alfresco-cs-ce-repository  1s
+search            app=crusty-opossum-alfresco-search-solr       1s
+share             app=crusty-opossum-alfresco-cs-ce-share       1s
+transformers      component=transformers                        1s
+
+==> v1/PersistentVolumeClaim
+NAME                                       STATUS  VOLUME                                    CAPACITY  ACCESS MODES  STORAGECLASS  AGE
+alfresco-volume-claim                      Bound   pvc-870e6fb5-69f8-467d-978d-41749bd94316  20Gi      RWO           standard      2s
+crusty-opossum-alfresco-search-solr-claim  Bound   pvc-ae14d46b-1675-4d91-ad40-7bba326f53d7  10Gi      RWO           standard      2s
+
+==> v1/Pod(related)
+NAME                                                           READY  STATUS             RESTARTS  AGE
+crusty-opossum-activemq-77454ccdf7-5stt8                       0/1    Pending            0         2s
+crusty-opossum-alfresco-cs-ce-imagemagick-5fff4c7f79-bvvl9     0/1    Pending            0         2s
+crusty-opossum-alfresco-cs-ce-libreoffice-8574cfd854-b48pz     0/1    Pending            0         2s
+crusty-opossum-alfresco-cs-ce-pdfrenderer-57bff47758-sh7kr     0/1    Pending            0         2s
+crusty-opossum-alfresco-cs-ce-repository-6c694b5df6-vxfwn      0/1    Pending            0         2s
+crusty-opossum-alfresco-cs-ce-share-65ccbd6fc5-dfvcg           0/1    ContainerCreating  0         2s
+crusty-opossum-alfresco-cs-ce-tika-7888887d9c-fjb4g            0/1    Pending            0         2s
+crusty-opossum-alfresco-cs-ce-transform-misc-84886848d9-zlt4g  0/1    Pending            0         2s
+crusty-opossum-alfresco-search-solr-5657d5669-nsmd4            0/1    Pending            0         2s
+crusty-opossum-keycl-0                                         0/1    Pending            0         2s
+crusty-opossum-nginx-ingress-controller-7bccdbcd9d-m2287       0/1    Pending            0         2s
+crusty-opossum-nginx-ingress-default-backend-5b6596b9cb-hnx8l  0/1    Pending            0         1s
+crusty-opossum-postgresql-acs-59dfc9fd5-ct2fr                  0/1    ContainerCreating  0         2s
+crusty-opossum-postgresql-id-7fdcb6d6cb-4nqgn                  0/1    Pending            0         2s
+
+==> v1/Secret
+NAME                                    TYPE    DATA  AGE
+crusty-opossum-alfresco-cs-ce-dbsecret  Opaque  2     1s
+crusty-opossum-keycl-http               Opaque  1     1s
+crusty-opossum-postgresql-acs           Opaque  1     2s
+crusty-opossum-postgresql-id            Opaque  1     1s
+realm-secret                            Opaque  1     2s
+
+==> v1/Service
+NAME                                          TYPE          CLUSTER-IP      EXTERNAL-IP  PORT(S)                       AGE
+crusty-opossum-activemq-broker                ClusterIP     10.99.38.224    <none>       61613/TCP,61616/TCP,5672/TCP  1s
+crusty-opossum-activemq-web-console           NodePort      10.107.38.139   <none>       8161:30702/TCP                2s
+crusty-opossum-alfresco-cs-ce-imagemagick     ClusterIP     10.104.128.40   <none>       80/TCP                        2s
+crusty-opossum-alfresco-cs-ce-libreoffice     ClusterIP     10.105.145.195  <none>       80/TCP                        2s
+crusty-opossum-alfresco-cs-ce-pdfrenderer     ClusterIP     10.106.130.83   <none>       80/TCP                        1s
+crusty-opossum-alfresco-cs-ce-repository      ClusterIP     10.98.1.43      <none>       80/TCP                        1s
+crusty-opossum-alfresco-cs-ce-share           ClusterIP     10.99.67.209    <none>       80/TCP                        2s
+crusty-opossum-alfresco-cs-ce-tika            ClusterIP     10.103.155.7    <none>       80/TCP                        2s
+crusty-opossum-alfresco-cs-ce-transform-misc  ClusterIP     10.98.139.217   <none>       80/TCP                        2s
+crusty-opossum-alfresco-search-solr           ClusterIP     10.96.142.153   <none>       80/TCP                        2s
+crusty-opossum-keycl-headless                 ClusterIP     None            <none>       80/TCP                        2s
+crusty-opossum-keycl-http                     ClusterIP     10.106.19.205   <none>       80/TCP                        2s
+crusty-opossum-nginx-ingress-controller       LoadBalancer  10.97.15.230    <pending>    80:31455/TCP,443:30817/TCP    2s
+crusty-opossum-nginx-ingress-default-backend  ClusterIP     10.99.14.178    <none>       80/TCP                        2s
+crusty-opossum-postgresql-acs                 ClusterIP     10.96.236.223   <none>       5432/TCP                      2s
+crusty-opossum-postgresql-id                  ClusterIP     10.104.150.163  <none>       5432/TCP                      2s
+
+==> v1/ServiceAccount
+NAME                          SECRETS  AGE
+crusty-opossum-nginx-ingress  1        2s
+
+==> v1/StatefulSet
+NAME                  READY  AGE
+crusty-opossum-keycl  0/1    1s
+
+==> v1beta1/ClusterRole
+NAME                          AGE
+crusty-opossum-nginx-ingress  3s
+
+==> v1beta1/ClusterRoleBinding
+NAME                          AGE
+crusty-opossum-nginx-ingress  3s
+
+==> v1beta1/Deployment
+NAME                                          READY  UP-TO-DATE  AVAILABLE  AGE
+crusty-opossum-activemq                       0/1    1           0          1s
+crusty-opossum-alfresco-cs-ce-imagemagick     0/1    1           0          1s
+crusty-opossum-alfresco-cs-ce-libreoffice     0/1    0           0          1s
+crusty-opossum-alfresco-cs-ce-pdfrenderer     0/1    0           0          1s
+crusty-opossum-alfresco-cs-ce-repository      0/1    1           0          1s
+crusty-opossum-alfresco-cs-ce-share           0/1    1           0          1s
+crusty-opossum-alfresco-cs-ce-tika            0/1    0           0          1s
+crusty-opossum-alfresco-cs-ce-transform-misc  0/1    0           0          1s
+crusty-opossum-alfresco-search-solr           0/1    0           0          1s
+crusty-opossum-nginx-ingress-controller       0/1    1           0          1s
+crusty-opossum-nginx-ingress-default-backend  0/1    0           0          1s
+crusty-opossum-postgresql-acs                 0/1    1           0          1s
+crusty-opossum-postgresql-id                  0/1    1           0          1s
+
+==> v1beta1/Ingress
+NAME                                      HOSTS                ADDRESS  PORTS  AGE
+crusty-opossum-alfresco-cs-ce-repository  acs-community.local  80       1s
+crusty-opossum-alfresco-cs-ce-share       acs-community.local  80       1s
+crusty-opossum-alfresco-identity-service  *                    80       1s
+
+==> v1beta1/PodDisruptionBudget
+NAME                                          MIN AVAILABLE  MAX UNAVAILABLE  ALLOWED DISRUPTIONS  AGE
+crusty-opossum-nginx-ingress-controller       1              N/A              0                    1s
+crusty-opossum-nginx-ingress-default-backend  1              N/A              0                    1s
+
+==> v1beta1/Role
+NAME                          AGE
+crusty-opossum-nginx-ingress  3s
+
+==> v1beta1/RoleBinding
+NAME                          AGE
+crusty-opossum-nginx-ingress  3s
+
+
+NOTES:
+
+
+
+You can access all components of Alfresco Content Services Community using the same root address, but different paths as follows:
+
+  Content: http://acs-community.local:30435/alfresco
+  Share: http://acs-community.local:30435/share
+  Api-Explorer: http://acs-community.local:30435/api-explorer
+
+
